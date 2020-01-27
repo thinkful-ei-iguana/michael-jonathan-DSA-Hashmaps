@@ -45,19 +45,27 @@ function palindrome(string) {
   stringHash.MAX_LOAD_RATIO = 1;
   stringHash.SIZE_RATIO = 2;
   for (let i = 0; i < stringArray.length; i++) {
-    stringHash.set(stringArray[i], stringArray[i]);
+    try {
+      let val = stringHash.get(stringArray[i]);
+      stringHash.set(stringArray[i], val+1);
+    }
+    catch(err) {
+      stringHash.set(stringArray[i], 1);
+    }     
   }
-  console.log(stringArray.length);
-  console.log(stringHash.length);
-  console.log(stringHash._hashTable);
-  if (stringArray.length === (stringHash.length * 2 - 1)){
-    return `${string} can be rearranged into a palindrome.`;
+  let oddCounter = 0;
+  for (let i = 0; i < stringArray.length; i++){
+    if(stringHash.get(stringArray[i]) % 2 !== 0) {
+      oddCounter = oddCounter + 1;
+    }
   }
-  else {
+  
+  if (oddCounter > 1) {
     return `${string} cannot be rearranged into a palindrome.`;
   }
+  else return `${string} can be rearranged into a palindrome.`;
 }
 
-console.log(palindrome('aeiouoiea'));
+console.log(palindrome('19111199'));
 
 //7 - Separate Chaining
