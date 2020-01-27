@@ -1,29 +1,20 @@
 const HashMap = require('./HashMap');
+const _Node = require('./node');
 
 const main = function() {
   const lotr = new HashMap();
   lotr.set('Hobbit', 'Bilbo');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Hobbit', 'Frodo');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Wizard', 'Gandalf');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Human', 'Aragorn');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Elf', 'Legolas');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Maiar', 'The Necromancer');
-  console.log('Capacity: ', lotr._capacity);
   lotr.set('Maiar', 'Sauron');
   lotr.set('RingBearer', 'Gollum');
   lotr.set('LadyOfLight', 'Galadriel');
   lotr.set('HalfElven', 'Arwen');
   lotr.set('Ent', 'Treebeard');
 
-  console.log(lotr._hashTable);
-  console.log('Should return Hobbit: ', lotr.get('Hobbit'));
-  console.log('Should return Sauron: ', lotr.get('Maiar'));
-  console.log('Capacity: ', lotr._capacity);
   //The Capacity is 24 because the Hashmap must resize after the 4th index is taken and a 5th value is attempted to be inserted. 8(capacity)*3(size_ratio);
 };
 
@@ -53,6 +44,7 @@ function palindrome(string) {
       stringHash.set(stringArray[i], 1);
     }     
   }
+
   let oddCounter = 0;
   for (let i = 0; i < stringArray.length; i++){
     if(stringHash.get(stringArray[i]) % 2 !== 0) {
@@ -68,4 +60,57 @@ function palindrome(string) {
 
 console.log(palindrome('19111199'));
 
-//7 - Separate Chaining
+//7 - Separate Chaining -  Algorithm to group a list of words into anagrams.
+
+// index normally
+// if duplicate key, start node as value => chain to next value.
+function anagramsChain(array) {
+  let anagramsHash = new HashMap();
+  anagramsHash.MAX_LOAD_RATIO = 1;
+  anagramsHash.SIZE_RATIO = 2;
+
+  for (let i = 0; i < array.length; i++){
+    let sorted = array[i].split('').sort().join('');
+    try {
+      anagramsHash.get(sorted);
+      if (anagramsHash.get(sorted).data) {
+        let testNode = anagramsHash.get(sorted);
+        let firstNode = testNode;
+        while(testNode.next !== null) {
+          testNode = testNode.next;
+        }
+        testNode.next = new _Node(array[i], null);
+      } else {
+        let newNode = new _Node(array[i], null);
+        let firstNode = new _Node(anagramsHash.get(sorted), newNode);
+        anagramsHash.set(sorted, firstNode);
+      }
+    }
+    catch(err) {
+      anagramsHash.set(sorted, array[i]);
+    }
+  }
+  let pairs = [[]];
+  let j = 0;
+  for (let i = 0; i < anagramsHash._hashTable.length; i++) {
+    if(anagramsHash._hashTable[i] !== undefined){
+      let currentLine = anagramsHash._hashTable[i];
+      let k = 0;
+      let grouping = [];
+      while (currentLine.value !== null){
+        grouping[k] = currentLine.value.data;
+        currentLine.value = currentLine.value.next;
+        k++;
+      }
+      pairs[j] = grouping;
+      j++;
+    }
+  }
+  return pairs;
+}
+
+const testArray = [
+  'east', 'cars', 'acre', 'arcs', 'teas', 'eats', 'race'
+];
+
+console.log(anagramsChain(testArray));

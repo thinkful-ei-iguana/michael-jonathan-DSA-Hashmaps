@@ -1,3 +1,5 @@
+const _Node = require('./node');
+
 class HashMap {
   constructor(initialCapacity=8) {
     this.length = 0;
